@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -e
+set -x
+
+now=$(date +'%s')
+outfile="./tmp/$now.dump"
+heroku pg:backups:capture
+heroku pg:backups:download --output $outfile
+pg_restore --verbose --clean --no-acl --no-owner  -d prrr-development $outfile
