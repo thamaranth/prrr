@@ -53,8 +53,8 @@ export default class PendingPrrrs extends Component {
     const prrrs = this.props.prrrs
       .filter(prrr => !prrr.claimed_by)
       .sort((a, b) =>
-        moment(b.claimed_at).valueOf() -
-        moment(a.claimed_at).valueOf()
+        moment(a.created_at).valueOf() -
+        moment(b.created_at).valueOf()
       )
 
     return <div>
