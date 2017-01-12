@@ -7,21 +7,21 @@ describe('Commands', function(){
     it('should insert a user into the database', function(){
       const commands = new Commands
       return commands.createUser({
-        name: 'Graham Campbell',
-        email: 'graham@alt-three.com',
+        name: 'Malcom X',
+        email: 'byanymeans@necessary.com',
         avatar_url: 'https://avatars1.githubusercontent.com/u/2829600?v=3&s=460',
         github_id: 123456,
-        github_username: 'Graham Campbell',
+        github_username: 'Malcom X',
         github_access_token: 'FAKE_GITHUB_ACCESS_TOKEN',
         github_refresh_token: null,
       })
       .then(user => {
         expect(user).to.be.an('object')
-        expect(user.name                ).to.eql('Graham Campbell')
-        expect(user.email               ).to.eql('graham@alt-three.com')
+        expect(user.name                ).to.eql('Malcom X')
+        expect(user.email               ).to.eql('byanymeans@necessary.com')
         expect(user.avatar_url          ).to.eql('https://avatars1.githubusercontent.com/u/2829600?v=3&s=460')
         expect(user.github_id           ).to.eql(123456)
-        expect(user.github_username     ).to.eql('Graham Campbell')
+        expect(user.github_username     ).to.eql('Malcom X')
         expect(user.github_access_token ).to.eql('FAKE_GITHUB_ACCESS_TOKEN')
         expect(user.github_refresh_token).to.eql(null)
         expect(user.created_at).to.be.a('date')
@@ -191,7 +191,7 @@ describe('Commands', function(){
           commands.createUser(prrrOwnerUserAttributes)
           return commands.createRecord('pull_request_review_requests',{
             id: 5,
-            owner: 'AbrahamFergie',
+            owner: 'Abraham',
             repo: 'floworky',
             number: 42,
             requested_by: 'AbrahamFerguson',
@@ -209,45 +209,45 @@ describe('Commands', function(){
         })
       })
     })
-  })
 
-  describe('unclaimStalePrrrs', function(){
-    it('should unclaim all uncompleted Prrrs from more than an hour ago', function() {
-      const commands = new Commands
-      const insertPrrr = attributes =>
-        knex
-          .insert(attributes)
-          .into('pull_request_review_requests')
+    describe('unclaimStalePrrrs', function(){
+      it('should unclaim all uncompleted Prrrs from more than an hour ago', function() {
+        const commands = new Commands
+        const insertPrrr = attributes =>
+          knex
+            .insert(attributes)
+            .into('pull_request_review_requests')
 
-      return Promise.all([
-        insertPrrr({
-          id: 33,
-          owner: 'anasauce',
-          repo: 'prrr-so-meta',
-          number: 45,
-          requested_by: 'anasauce',
-          claimed_by: 'deadlyicon',
-          claimed_at: moment().subtract(1, 'hour').toDate(),
-          created_at: '2017-01-09 09:52:08.244-08',
-          updated_at: '2017-01-03 17:38:54.803-08',
-        }),
-        insertPrrr({
-          id: 34,
-          owner: 'ykatz',
-          repo: 'prrr-be-awesome',
-          number: 45,
-          requested_by: 'anasauce',
-          claimed_by: 'peterparker',
-          claimed_at: moment().toDate(),
-          created_at: moment().toDate(),
-          updated_at: '2017-01-03 17:38:54.803-08',
-        }),
-      ])
-      .then(_ => commands.unclaimStalePrrrs())
-      .then(_ => commands.queries.getPrrrs())
-      .then(prrrs => {
-        expect(prrrs[1].claimed_at).to.eql(null)
-        expect(prrrs[0].claimed_at).to.not.eql(null)
+        return Promise.all([
+          insertPrrr({
+            id: 33,
+            owner: 'anasauce',
+            repo: 'old-ass-prrr',
+            number: 45,
+            requested_by: 'anasauce',
+            claimed_by: 'deadlyicon',
+            claimed_at: moment().subtract(1, 'hour').toDate(),
+            created_at: '2017-01-09 09:52:08.244-08',
+            updated_at: '2017-01-03 17:38:54.803-08',
+          }),
+          insertPrrr({
+            id: 34,
+            owner: 'ykatz',
+            repo: 'prrr-be-awesome',
+            number: 45,
+            requested_by: 'anasauce',
+            claimed_by: 'superman',
+            claimed_at: moment().toDate(),
+            created_at: moment().toDate(),
+            updated_at: '2017-01-03 17:38:54.803-08',
+          }),
+        ])
+        .then(_ => commands.unclaimStalePrrrs())
+        .then(_ => commands.queries.getPrrrs())
+        .then(prrrs => {
+          expect(prrrs[1].claimed_at).to.eql(null)
+          expect(prrrs[0].claimed_at).to.not.eql(null)
+        })
       })
     })
   })
