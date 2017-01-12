@@ -1,3 +1,6 @@
+import knex from '../../server/knex'
+import moment from 'moment'
+
 describe('Commands', function(){
 
   describe('createUser', function(){
@@ -178,5 +181,45 @@ describe('Commands', function(){
     })
   })
 
+  describe('unclaimStalePrrrs', function(){
+    it('should unclaim all uncompleted Prrrs from more than an hour ago', function() {
+      const commands = new Commands
+      const insertPrrr = attributes =>
+        knex
+          .insert(attributes)
+          .into('pull_request_review_requests')
+
+      return Promise.all([
+        insertPrrr({
+          id: 33,
+          owner: 'anasauce',
+          repo: 'prrr-so-meta',
+          number: 45,
+          requested_by: 'anasauce',
+          claimed_by: 'deadlyicon',
+          claimed_at: moment().subtract(1, 'hour').toDate(),
+          created_at: '2017-01-09 09:52:08.244-08',
+          updated_at: '2017-01-03 17:38:54.803-08',
+        }),
+        insertPrrr({
+          id: 34,
+          owner: 'ykatz',
+          repo: 'prrr-be-awesome',
+          number: 45,
+          requested_by: 'anasauce',
+          claimed_by: 'peterparker',
+          claimed_at: moment().toDate(),
+          created_at: moment().toDate(),
+          updated_at: '2017-01-03 17:38:54.803-08',
+        }),
+      ])
+      .then(_ => commands.unclaimStalePrrrs())
+      .then(_ => commands.queries.getPrrrs())
+      .then(prrrs => {
+        expect(prrrs[1].claimed_at).to.eql(null)
+        expect(prrrs[0].claimed_at).to.not.eql(null)
+      })
+    })
+  })
 
 })

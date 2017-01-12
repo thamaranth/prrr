@@ -1,7 +1,4 @@
-process.env.NODE_ENV = process.env.NODE_ENV || 'development'
-if (process.env.NODE_ENV === 'development')
-  require('dotenv').load()
-
+import './environment'
 import path from 'path'
 import express from 'express'
 import logger from 'morgan'

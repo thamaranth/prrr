@@ -202,6 +202,20 @@ export default class Commands {
       .then(firstRecord)
   }
 
+  unclaimStalePrrrs(prrr){
+    return this.knex
+      .table('pull_request_review_requests')
+      .update({
+        claimed_by: null,
+        claimed_at: null,
+        updated_at: new Date,
+      })
+      .whereRaw(`claimed_at <= NOW() - '1 hour'::INTERVAL`)
+      .whereNotNull('claimed_by')
+      .whereNotNull('claimed_at')
+      .whereNull('completed_at')
+  }
+
   archivePrrr(purrId){
     return this.knex
       .table('pull_request_review_requests')
