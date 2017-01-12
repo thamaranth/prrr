@@ -7,7 +7,6 @@
     "test": "webappatron test",
     "start": "webappatron start",
     "build": "webappatron build",
-    "worker": "node ./build/server/worker.js",
     "heroku-postbuild": "npm run build"
   },
   "keywords": [],
