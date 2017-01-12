@@ -1,5 +1,7 @@
-import './environment'
-import Commands from './commands'
+#!/usr/bin/env node
+
+require('../build/server/environment')
+const Commands = require('../build/server/commands').default
 
 new Commands().unclaimStalePrrrs()
   .then(() => {
