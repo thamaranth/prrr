@@ -7,7 +7,11 @@ export default class ErrorMessage extends Component {
   };
 
   render(){
-    return <div className="ErrorMessage">Error: {this.props.error.message}</div>
+    const { error } = this.props
+    return <div className="ErrorMessage">
+      <div>Error {error.context}: </div>
+      <div>{error.message}</div>
+    </div>
   }
 }
 

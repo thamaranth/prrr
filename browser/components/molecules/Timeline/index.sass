@@ -1,0 +1,46 @@
+.Timeline
+  border: 1px solid black
+  flex-direction: row
+  margin: 0%
+
+  &-wrapper
+    border-bottom: 1px dashed grey
+    flex-direction: row
+    background-image: linear-gradient(to right, #ffffff 13%, #d3d3d3 14%, #ffffff 14%, #ffffff 27%, #d3d3d3 28%, #ffffff 28%, #ffffff 40%, #d3d3d3 40.5%, #ffffff 41%, #ffffff 54%, #d3d3d3 54.5%, #ffffff 55%, #ffffff 69.5%, #d3d3d3 70%, #ffffff 70%, #ffffff 83.5%, #d3d3d3 84%, #ffffff 84%)
+
+  &-heading
+    list-style: none
+    padding-bottom: 10px
+    overflow: hidden
+    border-bottom: 1px solid #d3d3d3
+    margin-bottom: 0%
+
+    > li
+      float: left
+      padding: 0% 2% 0% 0%
+      color: grey
+      width: 14%
+
+  &-created
+    background-color: brown
+    height: 10px
+    margin-right: 0px
+    width: 1%
+    display: inline-block
+    max-width: 100%
+    border-top-left-radius: 3px
+    border-bottom-left-radius: 3px
+
+  &-claimed
+    background-color: olive
+    height: 10px
+    display: inline-block
+    max-width: 100%
+
+  &-completed
+    background-color: navy
+    height: 10px
+    display: inline-block
+    max-width: 100%
+    border-top-right-radius: 3px
+    border-bottom-right-radius: 3px

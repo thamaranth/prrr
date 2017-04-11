@@ -1,0 +1,16 @@
+.Timer
+  font-size: 400%
+
+  &-out-of-time
+    color: red
+    animation: Timer-blink 500ms linear infinite;
+
+@keyframes Timer-blink
+  0%
+    opacity: 0
+  49%
+    opacity: 0
+  50%
+    opacity: 1
+  100%
+    opacity: 1

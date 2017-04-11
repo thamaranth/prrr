@@ -1,4 +1,5 @@
 .LoggedOutHomePage
+  font-family: 'Raleway', sans-serif
   position: fixed
   top: 0
   left: 0
@@ -8,22 +9,29 @@
   width: 100%
   background-image: url('../../images/cat.jpg')
   background-attachment: fixed
-  background-position: center
+  background-position: center center
+  background-size: cover
   display: block
   padding-top: 50px
-  font-family: 'Lobster', cursive
-  text-shadow: 1px .5px #000
+
+  &-info,
+  &-SectionOne,
+  &-SectionThree
+    text-shadow: 1px .5px #000
   &-icon
     width: 25px
     height: 25px
+  &-info
+    font-size: 30px
+    margin-bottom: 50px
   &-SectionOne
     text-align: center
     color: #2C3539
     font-size: 100px
     color: white
-    > p
-      font-family: 'Lobster', cursive
-      font-size: 30px
+  &-title
+    font-family: 'Lobster', cursive
+
   &-SectionTwo
     text-align: center
     > .Button
@@ -31,7 +39,6 @@
       height: auto
       font-size: 20px
       padding: 10px
-      box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)
       &:hover
         background: #5CB85C
         border-color: #5CB85C

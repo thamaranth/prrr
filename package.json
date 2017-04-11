@@ -1,7 +1,7 @@
 {
   "name": "prrr",
   "version": "1.0.0",
-  "description": "",
+  "description": "[![CircleCI](https://circleci.com/gh/GuildCrafts/prrr.svg?style=svg)](https://circleci.com/gh/GuildCrafts/prrr)",
   "main": "index.js",
   "scripts": {
     "test": "webappatron test",
@@ -19,6 +19,7 @@
     "font-awesome": "^4.7.0",
     "github": "^7.1.0",
     "knex": "^0.12.6",
+    "loglevel": "^1.4.1",
     "moment": "^2.17.1",
     "morgan": "^1.7.0",
     "normalize.css": "^5.0.0",
@@ -29,7 +30,24 @@
     "simple-react-router": "0.0.13",
     "sinon": "^1.17.7",
     "sinon-chai": "^2.8.0",
+    "socket.io": "^1.7.2",
+    "stripcolorcodes": "^0.1.0",
     "visibilityjs": "^1.2.4",
-    "webappatron": "deadlyicon/webappatron"
-  }
+    "webappatron": "github:deadlyicon/webappatron#d3a798b",
+    "winston": "^2.3.0"
+  },
+  "devDependencies": {
+    "chromedriver": "^2.27.2"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GuildCrafts/prrr.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GuildCrafts/prrr/issues"
+  },
+  "homepage": "https://github.com/GuildCrafts/prrr#readme"
 }

@@ -2,6 +2,7 @@ import knex from '../knex'
 import Queries from '../queries'
 import Github from '../Github'
 import request from 'request-promise'
+import logger from '../logger'
 
 export default class Commands {
 
@@ -9,8 +10,6 @@ export default class Commands {
     this.currentUser = currentUser
     this.knex = _knex
     this.queries = new Queries(currentUser, _knex)
-    if (this.currentUser)
-      this.github = new Github(this.currentUser.github_access_token)
   }
 
   as(user){
@@ -28,6 +27,17 @@ export default class Commands {
   createUser(attributes){
     attributes.created_at = attributes.updated_at = new Date
     return this.createRecord('users', attributes)
+  }
+
+  updateUser(github_id, attributes){
+    attributes.updated_at = new Date
+    console.log('updateUser', github_id, attributes)
+    return this.knex
+      .table('users')
+      .update(attributes)
+      .where('github_id', github_id)
+      .returning('*')
+      .then(firstRecord)
   }
 
   findOrCreateUserFromGithubProfile({accessToken, refreshToken, profile}){
@@ -48,7 +58,11 @@ export default class Commands {
       .table('users')
       .where('github_id', profile.id)
       .first('*')
-      .then(user => user ? user : this.createUser(userAttributes))
+      .then(user =>
+        user
+          ? this.updateUser(userAttributes.github_id, userAttributes)
+          : this.createUser(userAttributes)
+      )
   }
 
   reopenPrrr(id){
@@ -66,80 +80,32 @@ export default class Commands {
   }
 
   createPrrr({owner, repo, number}){
-    return this.github.pullRequests.get({owner, repo, number})
-      .catch(originalError => {
-        const error = new Error('Pull Request Not Found')
-        error.originalError = originalError
-        error.status = 400
-        throw error
-      })
-      .then(pullRequest =>
-        this.github.repos.checkCollaborator({
-          owner,
-          repo,
-          username: this.currentUser.github_username,
-        })
-        .catch( originalError => {
-          const error = new Error(`You are not a collaborator on ${owner}/${repo}`)
-          error.originalError = originalError
-          error.status = 400
-          throw error
-        })
-        .then( response => pullRequest )
-      )
-      .then(pullRequest =>
-        this.queries.getPrrrForPullRequest(pullRequest)
-          .then(prrr => ({prrr, pullRequest}))
-      )
-      .then(({prrr, pullRequest}) => {
-        if (prrr) {
-          return prrr.archived_at || prrr.completed_at
-            ? this.reopenPrrr(prrr.id)
-            : prrr
-        }
-        return this.createRecord('pull_request_review_requests',{
-          owner,
-          repo,
-          number,
-          requested_by: this.currentUser.github_username,
-          created_at: new Date,
-          updated_at: new Date,
-        })
-      })
-  }
+    return this.queries.getPullRequest({owner, repo, number})
+      .then(pullRequest => {
+        if (!pullRequest) throw new Error('Pull Request Not Found')
+        const title = pullRequest.title
 
-  getOwnerUserForPrrr(prrr){
-    if (this.currentUser.github_username === prrr.owner)
-      return Promise.resolve(this.currentUser)
-
-    return this.queries.getUserByGithubUsername(prrr.owner)
-  }
-
-  addCurrentUserToPrrrRepo(prrr){
-    return this.getOwnerUserForPrrr(prrr)
-      .then(ownerUser => {
-        if (!ownerUser)
-          throw new Error(`unable to add ${this.currentUser.github_username} to ${prrr.owner}/${prrr.repo} because ${prrr.owner} does not have a Prrr account`)
-
-        const github = this.as(ownerUser).github
-        return github.repos.checkCollaborator({
-          owner:    prrr.owner,
-          repo:     prrr.repo,
-          username: this.currentUser.github_username,
-        })
-        .catch(error => {
-          if (error.code !== 404) throw error
-          return github.repos.addCollaborator({
-            owner:      prrr.owner,
-            repo:       prrr.repo,
-            username:   this.currentUser.github_username,
-            permission: 'push',
+        return this.queries.getPrrrForPullRequest({owner, repo, number})
+          .then(prrr => {
+            if (prrr) {
+              return prrr.archived_at || prrr.completed_at
+                ? this.reopenPrrr(prrr.id)
+                : prrr
+            }
+            return this.createRecord('pull_request_review_requests',{
+              owner,
+              repo,
+              number,
+              title,
+              requested_by: this.currentUser.github_username,
+              created_at: new Date,
+              updated_at: new Date,
+            })
           })
-        })
       })
   }
 
-  markPullRequestAsClaimed(prrrId){
+  claimPrrr(prrrId){
     return this.knex
       .table('pull_request_review_requests')
       .update({
@@ -151,40 +117,10 @@ export default class Commands {
       .whereNull('claimed_by')
       .whereNull('claimed_at')
       .returning('*')
-      .then(firstRecord)
-  }
-
-  sendReviewRequest(prrr){
-    return request({
-      uri: `https://api.github.com/repos/${prrr.owner}/${prrr.repo}/pulls/${prrr.number}/requested_reviewers`,
-      method: 'POST',
-      body: {
-        reviewers: [
-          this.currentUser.github_username,
-        ],
-      },
-      headers: {
-        'user-agent': 'prrr-learnersguild-org',
-        'Authorization': `token ${this.currentUser.github_access_token}`,
-        'Accept': 'application/vnd.github.black-cat-preview+json'
-      },
-      json: true,
-    })
-    .catch(originalError => {
-      const error = new Error('Failed to create Github Pull Request Review Request')
-      error.originalError = originalError
-      error.status = 500
-      throw error
-    })
-  }
-
-  claimPrrr(prrrId){
-    return this.queries.getPrrrById(prrrId)
-      .then(prrr =>
-        this.addCurrentUserToPrrrRepo(prrr)
-        .then(_ => this.sendReviewRequest(prrr))
-      )
-      .then(_ => this.markPullRequestAsClaimed(prrrId))
+      .then(records => {
+        if (records.length === 1) return records[0]
+        throw new Error('Unable to claim Prrr')
+      })
   }
 
   unclaimPrrr(prrrId){
@@ -196,19 +132,41 @@ export default class Commands {
         updated_at: new Date,
       })
       .where('id', prrrId)
-      .whereNotNull('claimed_by')
-      .whereNotNull('claimed_at')
+      .where('claimed_by', this.currentUser.github_username)
       .returning('*')
       .then(firstRecord)
   }
 
-  archivePrrr(purrId){
+  skipPrrr(prrrId){
+    logger.debug('skipPrrr', {prrrId})
+    return this.knex
+      .table('skipped_prrrs')
+      .insert({
+        prrr_id: prrrId,
+        github_username: this.currentUser.github_username,
+        skipped_at: new Date,
+      })
+      .catch(error => {
+        if (error.message.includes('duplicate key value violates unique constraint')) return
+        throw error
+      })
+      .then(_ => this.unclaimPrrr(prrrId))
+      .then(skippedPrrr => {
+        skippedPrrr.skipped = true
+        return this.claimPrrr()
+          .then(newClaimedPrrr => ({newClaimedPrrr, skippedPrrr}))
+      })
+  }
+
+  archivePrrr(prrrId){
     return this.knex
       .table('pull_request_review_requests')
       .update({
         archived_at: new Date,
       })
-      .where('id', purrId)
+      .where('id', prrrId)
+      .returning('*')
+      .then(firstRecord)
   }
 
   completePrrr(prrrId){

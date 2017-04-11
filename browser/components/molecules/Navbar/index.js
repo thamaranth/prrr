@@ -1,9 +1,11 @@
 import React, { Component, PropTypes } from 'react'
+import Link from '../../atoms/Link'
+import Icon from '../../atoms/Icon'
+import IconLink from '../../atoms/IconLink'
 import Button from '../../atoms/Button'
 import Avatar from '../../atoms/Avatar'
 import './index.sass'
-import favicon from '../../../images/favicon.ico'
-import logout from '../../../actions/logout'
+import prrrCat from '../../../images/prrrCat.ico'
 
 export default class Navbar extends Component {
 
@@ -15,19 +17,25 @@ export default class Navbar extends Component {
     const { user } = this.props.session
     return <div className="Navbar">
       <div>
-        <Button type={false} href="/">
-          <img src={favicon} className="Navbar-favicon" />
-        </Button>
-        &nbsp;
-        <Button className="Navbar-button-add-prrr" href="/request"> Add a Prrr </Button>
+        <Link className="Navbar-logo" href="/">
+          <img src={prrrCat} />
+          <span>Prrr</span>
+        </Link>
+        <IconLink className="Navbar-link" href="/request" type="plus-circle">Request A Review</IconLink>
+        <IconLink className="Navbar-link" href="/review"  type="eye"        >Review A PR</IconLink>
+        <IconLink className="Navbar-link" href="/metrics" type="area-chart" >Metrics</IconLink>
+        <IconLink className="Navbar-link" href="/all"     type="circle"     >All Prrrs</IconLink>
       </div>
       <div>
-        <p className="Navbar-title"> Prrr </p>
-      </div>
-      <div>
-        <span>{user.name}</span>
-        <Avatar user={user} />
-        <Button className="Navbar-button-logout" onClick={logout}>Logout</Button>
+        <Link href={`https://github.com/${user.github_username}`} externalLink className="Navbar-user-name">
+          <span>{user.name}</span>
+        </Link>
+        <Link href={`https://github.com/${user.github_username}`} externalLink className="Navbar-avatar">
+          <Avatar user={user} />
+        </Link>
+        <Link href="/logout" externalLink className="Navbar-button-logout">
+          <Icon type="sign-out" title="Logout" />
+        </Link>
       </div>
     </div>
   }

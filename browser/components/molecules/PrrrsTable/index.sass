@@ -1,5 +1,8 @@
 .PrrrsTable
   width: 100%
+  border-collapse: collapse
+  table-layout: fixed
+
   th
     text-align: left
 
@@ -12,3 +15,14 @@
       background-color: rgba(0,0,255,0.2)
     > td
       line-height: 38px
+
+    td,th
+      white-space: nowrap
+      overflow: hidden
+      text-overflow: ellipsis
+
+
+  &-pr
+    width: auto
+  &-requested
+    width: auto

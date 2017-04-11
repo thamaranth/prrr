@@ -44,11 +44,14 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(user, done) {
-  new Queries().getUserByGithubId(user.github_id)
-    .then( user  => done(null, user || false))
-    .catch(error => done(error))
+  done(null, user)
 });
 
+
+router.use('/login', (req, res, next) => {
+  req.session.redirectTo = req.query.r
+  next()
+})
 
 router.get('/login', passport.authenticate('github'));
 
@@ -57,8 +60,26 @@ router.get('/auth/github/callback',
   passport.authenticate('github', { failureRedirect: '/login' }),
   function(req, res) {
     // Successful authentication, redirect home.
-    res.redirect('/');
+    res.redirect(req.session.redirectTo || '/')
   }
-);
+)
+
+router.get('/logout', (req, res, next) => {
+  req.logout()
+  res.redirect('/')
+});
+
+
+if(process.env.NODE_ENV === 'test') {
+  router.get('/__login/:githubId', (request, response) => {
+    const { githubId } = request.params
+
+    request.session.passport = { user: { github_id: Number(githubId) } }
+
+    response.send(`
+      logged in as ${githubId}
+    `)
+  })
+}
 
 module.exports = router

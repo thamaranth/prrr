@@ -1,26 +1,34 @@
 import React, { Component } from 'react'
-import Button from '../atoms/Button'
+import Prrrs from '../../Prrrs'
 import Layout from '../molecules/Layout'
-import InspectObject from '../utils/InspectObject'
-import PendingPrrrs from '../molecules/PendingPrrrs'
-import ClaimedPrrrs from '../molecules/ClaimedPrrrs'
+import MyRequestedPrrrs from '../molecules/MyRequestedPrrrs'
+import MyReviewedPrrrs from '../molecules/MyReviewedPrrrs'
+import ClaimAPrrr from '../molecules/ClaimAPrrr'
+import ToggleableSection from '../utils/ToggleableSection'
 
 export default class LoggedInHomePage extends Component {
   render(){
-    const { session, prrrs=[] } = this.props
-    return <Layout className="HomePage" session={session}>
+    const { session, errors=[] } = this.props
 
-      <h1>Pull Requests Waiting For Review:</h1>
-      <PendingPrrrs
-        currentUser={session.user}
-        prrrs={prrrs}
-      />
+    const prrrs = new Prrrs({
+      currentUser: session.user,
+      prrrs: this.props.prrrs,
+    })
 
-      <h1>Claimed Pull Requests:</h1>
-      <ClaimedPrrrs
-        currentUser={session.user}
-        prrrs={prrrs}
-      />
+    return <Layout className="HomePage" session={session} errors={errors}>
+      <ToggleableSection title="My Requested Prrrs">
+        <MyRequestedPrrrs
+          currentUser={session.user}
+          prrrs={prrrs}
+        />
+      </ToggleableSection>
+
+      <ToggleableSection title="My Reviewed Prrrs">
+        <MyReviewedPrrrs
+          currentUser={session.user}
+          prrrs={prrrs}
+        />
+      </ToggleableSection>
     </Layout>
   }
 }

@@ -1,7 +1,5 @@
 import React, { Component } from 'react'
 import state from '../state'
-import '../actions/loadSession'
-import '../actions/startPolingForPrrrs'
 import Router from '../Router'
 import InspectObject from './utils/InspectObject'
 
@@ -19,11 +17,14 @@ export default class Root extends Component {
   }
 
   update(newState){
-    this.setState(newState)
+    if (this.animationFrame)
+      cancelAnimationFrame(this.animationFrame)
+    this.animationFrame = requestAnimationFrame(_ => {
+      this.setState(newState)
+    })
   }
 
   render(){
-    console.info('Root#render', this.state)
     if (this.state.loadSessionError)
       return <div>
         <h1>ERROR:</h1>

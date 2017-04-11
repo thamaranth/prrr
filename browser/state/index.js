@@ -24,7 +24,7 @@ const state = {
 
   trigger(){
     if (this.scheduledTrigger) return
-    this.scheduledTrigger = requestAnimationFrame(()=>{
+    this.scheduledTrigger = setTimeout(()=>{
       delete this.scheduledTrigger
       this.subscribers.forEach(subscriber => {
         subscriber(value)

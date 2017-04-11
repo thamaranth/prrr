@@ -4,8 +4,8 @@ import Icon from '../../atoms/Icon'
 import Date from '../../atoms/Date'
 import Button from '../../atoms/Button'
 import GithubUsername from '../../atoms/GithubUsername'
-import claimPrrr from '../../../actions/claimPrrr'
-import archivePrrr from '../../../actions/archivePrrr'
+import { archivePrrr } from '../../../actions'
+import prrrToPullRequestURL from '../../../prrrToPullRequestURL'
 import './index.sass'
 
 export default class PrrrsTable extends Component {
@@ -24,39 +24,28 @@ export default class PrrrsTable extends Component {
       renderAdditionalHeaders,
     } = this.props
     const rows = prrrs.map(prrr => {
-      const requestByCurrentUser = prrr.requested_by === currentUser.github_username
-      const href = `https://github.com/${prrr.owner}/${prrr.repo}/pull/${prrr.number}`
+      const href = prrrToPullRequestURL(prrr)
       return <tr key={prrr.id}>
-        <td>
+        <td className="PrrrsTable-pr">
           <Link href={href} target="_blank">
-            {prrr.owner}/{prrr.repo}
-          </Link>
-          &nbsp;
-          <Link href={href} target="_blank">
-            {prrr.number}
+            {prrr.owner}/{prrr.repo}/pull/{prrr.number}
           </Link>
         </td>
-        <td>
+        <td className="PrrrsTable-requested">
           <span>by&nbsp;</span>
           <GithubUsername username={prrr.requested_by} currentUser={currentUser} />
           <span>&nbsp;</span>
           <Date fromNow date={prrr.created_at} />
         </td>
         {renderAdditionalCells(prrr)}
-        <td>
-          <Button onClick={_ => confirmArchivePrrr(href, prrr)} disabled={!requestByCurrentUser}>
-            <Icon type="times" />
-          </Button>
-        </td>
       </tr>
     })
     return <table className={`PrrrsTable ${this.props.className||''}`}>
       <thead>
         <tr>
-          <th>Pull Request</th>
-          <th>Requested</th>
+          <th className="PrrrsTable-pr">Pull Request</th>
+          <th className="PrrrsTable-requested">Requested</th>
           {renderAdditionalHeaders()}
-          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -64,9 +53,4 @@ export default class PrrrsTable extends Component {
       </tbody>
     </table>
   }
-}
-
-function confirmArchivePrrr(href, prrr){
-  const message = `Are you sure you want to archive your\n\nPull Request Review Request for\n\n${href}`
-  if (confirm(message)) archivePrrr(prrr.id)
 }

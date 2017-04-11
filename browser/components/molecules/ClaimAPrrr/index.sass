@@ -1,0 +1,49 @@
+.ClaimAPrrr
+  border-style: solid
+  border-color: black
+  border-width: 2px
+  border-radius: 5px
+
+  &-UserClaimedAPrrr
+    display: flex
+    flex-direction: row
+    align-items: stretch
+    justify-content: space-between
+    padding: 1em
+    background-color: DarkTurquoise
+    height: inherit
+    max-height: 100%
+    &-deadline
+      align-self: center
+    &-buttons
+      display: flex
+      flex-direction: column
+      justify-content: center
+
+  &-UserNeedsToClaimAPrrr
+    background-color: DarkSeaGreen
+    padding: 1em
+    height: inherit
+    max-height: 100%
+    &-Available,
+    &-Unavailable
+      display: flex
+      flex-direction: row
+      flex-wrap: wrap
+      align-items: center
+      justify-content: space-between
+  .Button
+    display: block
+    width: 200px
+    margin-bottom: 0.25em
+    &:last-child
+      margin-bottom: 0
+
+  .ReviewButton
+    background: DarkTurquoise
+    border-style: dashed
+    border-width: 2px
+    border-color: black
+    height: 95px
+    width: 95px
+    border-radius: 20px

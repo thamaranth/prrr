@@ -10,12 +10,14 @@ export default class LoggedOutHomePage extends Component {
   render(){
     return <div className="LoggedOutHomePage">
       <div className="LoggedOutHomePage-SectionOne">
-        Prrr
-        <img src={favicon} className="LoggedOutHomePage-icon" />
-        <p className="LoggedOutHomePage-info"> The Pull Request Review Request Tool </p>
+        <span className="LoggedOutHomePage-title">
+          Prrr
+          <img src={favicon} className="LoggedOutHomePage-icon" />
+        </span>
+        <div className="LoggedOutHomePage-info">Pull Request Review Request</div>
       </div>
       <div className="LoggedOutHomePage-SectionTwo">
-        <Button href="/login" externalLink>Login or Signup via Github</Button>
+        <Button href={`/login?r=${encodeURIComponent(location.pathname)}`} externalLink>Login via Github</Button>
       </div>
       <div className="LoggedOutHomePage-SectionThree">
         <p> Review Together. </p>
